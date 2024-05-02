@@ -102,7 +102,7 @@ void* MemoryAllocator::mem_alloc(size_t size)
     if(newMemBlock->next)
         newMemBlock->next->prev = newMemBlock;
 
-    // adding in list of all used fragments (void*)((char*)newMemBlock + sizeof(MemBlock));
+    // adding in list of all used fragments
      if(m_used == nullptr)
      {
          m_used = newMemBlock;
@@ -177,34 +177,33 @@ void MemoryAllocator::merge_blocks(MemBlock* cur)
 
 void MemoryAllocator::remove_block(MemBlock* current)
 {
-    MemBlock *curr = m_used;
-    MemBlock *previous = nullptr;
-    //FIRST ELEM
-    if(curr==current){
-        if(curr->next == nullptr){
-            curr = curr->next;
-            m_used = curr;
-            return;
-        }
-        previous = curr;
-        curr = curr->next;
-        previous->next = nullptr;
-        curr->prev = nullptr;
-        m_used = curr;
+    MemBlock* curr = m_used;
+    MemBlock* previous = nullptr;
+
+    if (curr == current)
+    {
+        m_used = curr->next;
+        if (m_used != nullptr)
+            m_used->prev = nullptr;
+        curr = nullptr;
         return;
     }
 
-    while(curr!=current && curr!= nullptr){
+    while (curr != nullptr && curr != current)
+    {
         previous = curr;
         curr = curr->next;
     }
-    //NOT FOUND
-    if(curr== nullptr) return;
+
+    if (curr == nullptr)
+        return;
+
     previous->next = curr->next;
-    curr->prev = nullptr;
-    current->next = nullptr;
-    return;
+    if (curr->next != nullptr)
+        curr->next->prev = previous;
+    curr = nullptr;
 }
+
 
 int MemoryAllocator::mem_free(void* ptr)
 {
