@@ -1,0 +1,144 @@
+GAS LISTING /tmp/cczcuLuv.s 			page 1
+
+
+   1              		.file	"riscv.cpp"
+   2              		.option pic
+   3              		.option norelax
+   4              		.text
+   5              	.Ltext0:
+   6              		.align	2
+   7              		.globl	_ZN5Riscv10popSppSpieEv
+   9              	_ZN5Riscv10popSppSpieEv:
+  10              	.LFB16:
+  11              		.file 1 "src/riscv.cpp"
+   1:src/riscv.cpp **** #include "../h/riscv.hpp"
+   2:src/riscv.cpp **** 
+   3:src/riscv.cpp **** void Riscv::popSppSpie()
+   4:src/riscv.cpp **** {
+  12              		.loc 1 4 1
+  13              		.cfi_startproc
+  14 0000 130101FF 		addi	sp,sp,-16
+  15              		.cfi_def_cfa_offset 16
+  16 0004 23348100 		sd	s0,8(sp)
+  17              		.cfi_offset 8, -8
+  18 0008 13040101 		addi	s0,sp,16
+  19              		.cfi_def_cfa 8, 0
+   5:src/riscv.cpp ****     __asm__ volatile ("csrw sepc, ra");
+  20              		.loc 1 5 5
+  21              		.loc 1 5 39 is_stmt 0
+  22              	#APP
+  23              	# 5 "src/riscv.cpp" 1
+   6              	    __asm__ volatile ("sret");
+  24              		csrw sepc, ra
+  25              	# 0 "" 2
+  26              		.loc 1 6 5 is_stmt 1
+  27              		.loc 1 6 30 is_stmt 0
+  28              	# 6 "src/riscv.cpp" 1
+   7              	}...
+  29              		sret
+  30              	# 0 "" 2
+  31              		.loc 1 7 1
+  32              	#NO_APP
+  33 0014 03348100 		ld	s0,8(sp)
+  34              		.cfi_restore 8
+  35              		.cfi_def_cfa 2, 16
+  36 0018 13010101 		addi	sp,sp,16
+  37              		.cfi_def_cfa_offset 0
+  38 001c 67800000 		jr	ra
+  39              		.cfi_endproc
+  40              	.LFE16:
+  42              	.Letext0:
+  43              		.file 2 "src/../h/../lib/hw.h"
+  44              		.file 3 "src/../h/riscv.hpp"
+GAS LISTING /tmp/cczcuLuv.s 			page 2
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 riscv.cpp
+     /tmp/cczcuLuv.s:9      .text:0000000000000000 _ZN5Riscv10popSppSpieEv
+     /tmp/cczcuLuv.s:13     .text:0000000000000000 .L0 
+     /tmp/cczcuLuv.s:14     .text:0000000000000000 .L0 
+     /tmp/cczcuLuv.s:15     .text:0000000000000004 .L0 
+     /tmp/cczcuLuv.s:17     .text:0000000000000008 .L0 
+     /tmp/cczcuLuv.s:19     .text:000000000000000c .L0 
+     /tmp/cczcuLuv.s:21     .text:000000000000000c .L0 
+       src/riscv.cpp:5      .text:000000000000000c .L0 
+     /tmp/cczcuLuv.s:27     .text:0000000000000010 .L0 
+       src/riscv.cpp:6      .text:0000000000000010 .L0 
+     /tmp/cczcuLuv.s:33     .text:0000000000000014 .L0 
+     /tmp/cczcuLuv.s:34     .text:0000000000000018 .L0 
+     /tmp/cczcuLuv.s:35     .text:0000000000000018 .L0 
+     /tmp/cczcuLuv.s:37     .text:000000000000001c .L0 
+     /tmp/cczcuLuv.s:39     .text:0000000000000020 .L0 
+     /tmp/cczcuLuv.s:45     .text:0000000000000020 .L0 
+     /tmp/cczcuLuv.s:364    .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+     /tmp/cczcuLuv.s:693    .debug_str:00000000000001ce .LASF53
+     /tmp/cczcuLuv.s:707    .debug_str:00000000000002db .LASF54
+     /tmp/cczcuLuv.s:727    .debug_str:0000000000000382 .LASF55
+     /tmp/cczcuLuv.s:5      .text:0000000000000000 .Ltext0
+     /tmp/cczcuLuv.s:42     .text:0000000000000020 .Letext0
+     /tmp/cczcuLuv.s:631    .debug_line:0000000000000000 .Ldebug_line0
+     /tmp/cczcuLuv.s:703    .debug_str:00000000000002c6 .LASF0
+     /tmp/cczcuLuv.s:683    .debug_str:0000000000000172 .LASF1
+     /tmp/cczcuLuv.s:673    .debug_str:000000000000012f .LASF2
+     /tmp/cczcuLuv.s:651    .debug_str:0000000000000087 .LASF4
+     /tmp/cczcuLuv.s:679    .debug_str:0000000000000158 .LASF3
+     /tmp/cczcuLuv.s:637    .debug_str:0000000000000026 .LASF5
+     /tmp/cczcuLuv.s:635    .debug_str:0000000000000013 .LASF6
+     /tmp/cczcuLuv.s:667    .debug_str:00000000000000fa .LASF7
+     /tmp/cczcuLuv.s:715    .debug_str:0000000000000317 .LASF8
+     /tmp/cczcuLuv.s:649    .debug_str:0000000000000079 .LASF9
+     /tmp/cczcuLuv.s:749    .debug_str:0000000000000429 .LASF10
+     /tmp/cczcuLuv.s:671    .debug_str:0000000000000120 .LASF11
+     /tmp/cczcuLuv.s:743    .debug_str:00000000000003fe .LASF12
+     /tmp/cczcuLuv.s:723    .debug_str:0000000000000365 .LASF13
+     /tmp/cczcuLuv.s:685    .debug_str:0000000000000185 .LASF14
+     /tmp/cczcuLuv.s:661    .debug_str:00000000000000d0 .LASF15
+     /tmp/cczcuLuv.s:719    .debug_str:0000000000000339 .LASF16
+     /tmp/cczcuLuv.s:663    .debug_str:00000000000000e6 .LASF56
+     /tmp/cczcuLuv.s:691    .debug_str:00000000000001c3 .LASF17
+     /tmp/cczcuLuv.s:733    .debug_str:00000000000003bc .LASF19
+     /tmp/cczcuLuv.s:665    .debug_str:00000000000000ec .LASF18
+     /tmp/cczcuLuv.s:655    .debug_str:00000000000000a3 .LASF20
+     /tmp/cczcuLuv.s:725    .debug_str:0000000000000375 .LASF21
+     /tmp/cczcuLuv.s:687    .debug_str:0000000000000191 .LASF22
+     /tmp/cczcuLuv.s:695    .debug_str:0000000000000292 .LASF23
+     /tmp/cczcuLuv.s:639    .debug_str:000000000000002d .LASF25
+     /tmp/cczcuLuv.s:697    .debug_str:000000000000029b .LASF27
+     /tmp/cczcuLuv.s:653    .debug_str:000000000000008e .LASF29
+     /tmp/cczcuLuv.s:709    .debug_str:00000000000002e9 .LASF24
+     /tmp/cczcuLuv.s:677    .debug_str:0000000000000145 .LASF26
+     /tmp/cczcuLuv.s:659    .debug_str:00000000000000c9 .LASF28
+     /tmp/cczcuLuv.s:669    .debug_str:000000000000010d .LASF30
+GAS LISTING /tmp/cczcuLuv.s 			page 3
+
+
+     /tmp/cczcuLuv.s:705    .debug_str:00000000000002d3 .LASF31
+     /tmp/cczcuLuv.s:729    .debug_str:000000000000039d .LASF32
+     /tmp/cczcuLuv.s:681    .debug_str:000000000000016a .LASF33
+     /tmp/cczcuLuv.s:713    .debug_str:0000000000000303 .LASF34
+     /tmp/cczcuLuv.s:735    .debug_str:00000000000003d4 .LASF35
+     /tmp/cczcuLuv.s:645    .debug_str:000000000000005f .LASF36
+     /tmp/cczcuLuv.s:675    .debug_str:000000000000013d .LASF37
+     /tmp/cczcuLuv.s:745    .debug_str:000000000000040e .LASF38
+     /tmp/cczcuLuv.s:747    .debug_str:0000000000000422 .LASF39
+     /tmp/cczcuLuv.s:633    .debug_str:0000000000000000 .LASF40
+     /tmp/cczcuLuv.s:641    .debug_str:0000000000000042 .LASF41
+     /tmp/cczcuLuv.s:711    .debug_str:00000000000002f0 .LASF42
+     /tmp/cczcuLuv.s:741    .debug_str:00000000000003f8 .LASF43
+     /tmp/cczcuLuv.s:717    .debug_str:0000000000000327 .LASF44
+     /tmp/cczcuLuv.s:647    .debug_str:0000000000000073 .LASF45
+     /tmp/cczcuLuv.s:739    .debug_str:00000000000003e6 .LASF46
+     /tmp/cczcuLuv.s:731    .debug_str:00000000000003b1 .LASF47
+     /tmp/cczcuLuv.s:701    .debug_str:00000000000002ae .LASF48
+     /tmp/cczcuLuv.s:657    .debug_str:00000000000000be .LASF49
+     /tmp/cczcuLuv.s:689    .debug_str:00000000000001ab .LASF50
+     /tmp/cczcuLuv.s:699    .debug_str:00000000000002a4 .LASF51
+     /tmp/cczcuLuv.s:721    .debug_str:000000000000034f .LASF52
+     /tmp/cczcuLuv.s:737    .debug_str:00000000000003dc .LASF57
+     /tmp/cczcuLuv.s:643    .debug_str:0000000000000049 .LASF58
+     /tmp/cczcuLuv.s:10     .text:0000000000000000 .LFB16
+     /tmp/cczcuLuv.s:40     .text:0000000000000020 .LFE16
+     /tmp/cczcuLuv.s:46     .debug_info:0000000000000000 .Ldebug_info0
+
+NO UNDEFINED SYMBOLS
