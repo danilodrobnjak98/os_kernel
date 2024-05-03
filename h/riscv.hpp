@@ -10,12 +10,6 @@ public:
     // pop sstatus.spp and sstatus.spie bits (has to be a non inline function)
     static void popSppSpie();
 
-    // push x3..x31 registers onto stack
-    static void pushRegisters();
-
-    // pop x3..x31 registers onto stack
-    static void popRegisters();
-
     // read register scause
     static uint64 r_scause();
 
@@ -42,9 +36,9 @@ public:
 
     enum BitMaskSip
     {
-        SIP_SSIE = (1 << 1),
-        SIP_STIE = (1 << 5),
-        SIP_SEIE = (1 << 9),
+        SIP_SSIP = (1 << 1),
+        SIP_STIP = (1 << 5),
+        SIP_SEIP = (1 << 9),
     };
 
     // mask set register sip
@@ -78,7 +72,13 @@ public:
     // write register sstatus
     static void w_sstatus(uint64 sstatus);
 
+    // supervisor trap
+    static void supervisorTrap();
+
 private:
+
+    // supervisor trap handler
+    static void handleSupervisorTrap();
 
 };
 

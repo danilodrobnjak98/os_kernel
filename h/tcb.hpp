@@ -1,34 +1,37 @@
-#ifndef _CCB_H_
-#define _CCB_H_
+#ifndef _TCB_HPP_
+#define _TCB_HPP_
 
 #include "../lib/hw.h"
 #include "scheduler.hpp"
 
-// Coroutine Control Block
-class CCB
+// Thread Control Block
+class TCB
 {
 public:
-    ~CCB() { delete[] stack; }
+    ~TCB() { delete[] stack; }
 
     bool isFinished() const { return finished; }
 
     void setFinished(bool value) { finished = value; }
 
+    uint64 getTimeSlice() const { return timeSlice; }
+
     using Body = void (*)();
 
-    static CCB *createCoroutine(Body body);
+    static TCB *createThread(Body body);
 
     static void yield();
 
-    static CCB *running;
+    static TCB *running;
 
 private:
-    explicit CCB(Body body) :
+    TCB(Body body, uint64 timeSlice) :
             body(body),
             stack(body != nullptr ? new uint64[STACK_SIZE] : nullptr),
-            context({body != nullptr ? (uint64) body : 0,
+            context({(uint64) &threadWrapper,
                      stack != nullptr ? (uint64) &stack[STACK_SIZE] : 0
                     }),
+            timeSlice(timeSlice),
             finished(false)
     {
         if (body != nullptr) { Scheduler::put(this); }
@@ -43,13 +46,21 @@ private:
     Body body;
     uint64 *stack;
     Context context;
+    uint64 timeSlice;
     bool finished;
+
+    friend class Riscv;
+
+    static void threadWrapper();
 
     static void contextSwitch(Context *oldContext, Context *runningContext);
 
     static void dispatch();
 
+    static uint64 timeSliceCounter;
+
     static uint64 constexpr STACK_SIZE = 1024;
+    static uint64 constexpr TIME_SLICE = 2;
 };
 
-#endif //_CCB_H_
+#endif //OS1_VEZBE07_RISCV_CONTEXT_SWITCH_2_INTERRUPT_TCB_HPP
