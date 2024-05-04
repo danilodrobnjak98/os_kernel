@@ -12,10 +12,10 @@ public:
     friend class Riscv;
 
     using Body = void (*)();
-   // using Body = void (*)(void *);
+    //using Body = void (*)(void *);
 
     static uint64 constexpr STACK_SIZE = 1024;
-    static uint64 constexpr TIME_SLICE = 2;
+    static uint64 constexpr TIME_SLICE = DEFAULT_TIME_SLICE;
 
     // creation and destruction
     static TCB *createThread(Body body);

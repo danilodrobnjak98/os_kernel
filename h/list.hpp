@@ -22,14 +22,14 @@ public:
 
     List<T> &operator=(const List<T> &) = delete;
 
-    void addFirst(T *data)
+    void addFirst(T* data)
     {
         Elem *elem = new Elem(data, head);
         head = elem;
         if (!tail) { tail = head; }
     }
 
-    void addLast(T *data)
+    void addLast(T* data)
     {
         Elem *elem = new Elem(data, 0);
         if (tail)
@@ -85,6 +85,15 @@ public:
     {
         if (!tail) { return 0; }
         return tail->data;
+    }
+
+    bool contains(T* data)
+    {
+        for (Elem *curr = head; curr && curr != tail; curr = curr->next)
+        {
+            if(curr->data == data) return true;
+        }
+        return false;
     }
 };
 

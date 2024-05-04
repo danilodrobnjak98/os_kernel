@@ -1,7 +1,14 @@
 #ifndef _RISCV_HPP_
 #define _RISCV_HPP_
 
+#define ECALL_SUPER         0x0000000000000009UL
+#define ECALL_USER          0x0000000000000008UL
+#define SOFTWARE_INTERRUPT  0x8000000000000001UL
+#define HARDWARE_INTERRUPT  0x8000000000000009UL
+#define INVALID_RETURN_VALUE 88888
+
 #include "../lib/hw.h"
+#include "../h/util.hpp"
 
 class Riscv
 {
@@ -74,12 +81,13 @@ public:
 
     // supervisor trap
     static void supervisorTrap();
-
 private:
 
     // supervisor trap handler
     static void handleSupervisorTrap();
 
+    static size_t readSyscallReg();
+    static void putReturnValue(int retValueInt, void* memAllocValue);
 };
 
 inline uint64 Riscv::r_scause()

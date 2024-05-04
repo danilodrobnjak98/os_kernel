@@ -1,30 +1,34 @@
-#include "../h/MemoryAllocator.hpp"
+#include "../h/syscall_c.hpp"
+#include "../h/print.hpp"
+#include "../h/riscv.hpp"
+
 using size_t = decltype(sizeof(0));
 
 void *operator new(size_t n)
 {
-    return MemoryAllocator::mem_alloc(n);
+    void* ret =  mem_alloc(n);
+    return  ret;
 }
 
 void *operator new[](size_t n)
 {
-    return MemoryAllocator::mem_alloc(n);
+    return mem_alloc(n);
 }
 
 void operator delete(void *p) noexcept
 {
-   int sts = MemoryAllocator::mem_free(p);
+   int sts = mem_free(p);
    if(sts != 0)
    {
-       MemoryAllocator::printString("ERROR delete(), mem_free prilikom brisanja!\n");
+       printString("ERROR delete(), mem_free prilikom brisanja!\n");
    }
 }
 
 void operator delete[](void *p) noexcept
 {
-    int sts = MemoryAllocator::mem_free(p);
+    int sts = mem_free(p);
     if(sts != 0)
     {
-        MemoryAllocator::printString("ERROR delete(), mem_free prilikom brisanja!\n");
+        printString("ERROR delete(), mem_free prilikom brisanja!\n");
     }
 }

@@ -5,6 +5,7 @@ MemBlock* MemoryAllocator::m_head;
 MemBlock* MemoryAllocator::m_used;
 MemBlockUsed* MemoryAllocator::m_used_head;
 MemBlockUsed* MemoryAllocator::m_used_tail;
+size_t MemoryAllocator::MAX_SIZE_MEMORY_ALLOCATOR;
 
 MemBlock::MemBlock(size_t sz)
         :
@@ -41,7 +42,7 @@ void MemoryAllocator::mem_init()
     m_head->size = (size_t)HEAP_END_ADDR - (size_t)HEAP_START_ADDR;
     m_head->next = m_head->prev = nullptr;
     m_head->isUsed = false;
-
+    MAX_SIZE_MEMORY_ALLOCATOR = m_head->size;
     m_used_head = m_used_tail = nullptr;
 }
 
@@ -83,8 +84,13 @@ void* MemoryAllocator::mem_alloc(size_t size)
     }
 
     size_t sz = calculate_size(size);
-    MemBlock* best_fit = find_best_fit(sz);
+    if(sz > MAX_SIZE_MEMORY_ALLOCATOR)
+    {
+        printString("ERROR: Not enough space! \n");
+        return nullptr;
+    }
 
+    MemBlock* best_fit = find_best_fit(sz);
     if(best_fit == nullptr)
     {
         printString("ERROR: couldn't find best fit\n");
