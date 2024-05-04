@@ -45,4 +45,4 @@ private:
     static MemBlock* m_head, *m_used;
     static MemBlockUsed* m_used_head, *m_used_tail;
 };
-#endif
+#endif //_MEMORY_ALLOCATOR_HPP_

@@ -14,11 +14,17 @@ void *operator new[](size_t n)
 void operator delete(void *p) noexcept
 {
    int sts = MemoryAllocator::mem_free(p);
-   if(sts != 0) MemoryAllocator::printString("Neka greska prilikom brisanja!\n");
+   if(sts != 0)
+   {
+       MemoryAllocator::printString("ERROR delete(), mem_free prilikom brisanja!\n");
+   }
 }
 
 void operator delete[](void *p) noexcept
 {
     int sts = MemoryAllocator::mem_free(p);
-    if(sts != 0) MemoryAllocator::printString("Neka greska prilikom brisanja!\n");
+    if(sts != 0)
+    {
+        MemoryAllocator::printString("ERROR delete(), mem_free prilikom brisanja!\n");
+    }
 }
