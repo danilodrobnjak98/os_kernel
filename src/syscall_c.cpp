@@ -19,3 +19,20 @@ int mem_free(void *ptr) {
     __asm__ volatile ("mv %[ret_value], a0" : [ret_value] "=r"(ret_value));
     return ret_value;
 }
+
+char getc()
+{
+    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_GETC));
+    __asm__ volatile("ecall");
+    char retVal;
+    __asm__ volatile("mv %0, a0" : "=r" (retVal));
+    return retVal;
+}
+
+void putc(char c)
+{
+    __asm__ volatile("mv a1, a0");
+    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_PUTC));
+    __asm__ volatile("ecall");
+
+}

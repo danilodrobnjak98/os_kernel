@@ -61,6 +61,17 @@ void Riscv::handleSupervisorTrap()
             int returnVal = MemoryAllocator::mem_free(memFreeArgument);
             putReturnValue(returnVal, nullptr);
         }
+        else if (sysCallRegisterCode == SysCallRegistersID::_GETC)
+        {
+            char retVal = __getc();
+            __asm__ volatile("csrw sscratch, %0" : : "r" (retVal));
+        }
+        else if(sysCallRegisterCode == SysCallRegistersID::_PUTC)
+        {
+            char argumentPutc;
+            __asm__ volatile("mv %0, a1" : "=r" (argumentPutc));
+            __putc(argumentPutc);
+        }
 
         w_sstatus(sstatus);
         w_sepc(sepc);
