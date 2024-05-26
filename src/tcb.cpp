@@ -1,5 +1,6 @@
 #include "../h/tcb.hpp"
 #include "../h/riscv.hpp"
+#include "../h/syscall_c.hpp"
 
 TCB *TCB::running = nullptr;
 uint64 TCB::timeSliceCounter = 0;
@@ -7,9 +8,9 @@ uint64 TCB::timeSliceCounter = 0;
 //
 // Only way off thread creation, constructor is private
 //
-TCB *TCB::createThread(Body body)
+TCB *TCB::createThread(Body body, void* args)
 {
-    return new TCB(body, TIME_SLICE);
+    return new TCB(body, TIME_SLICE, args);
 }
 //
 // yield method
@@ -34,15 +35,26 @@ void TCB::dispatch()
 //
 void TCB::threadWrapper()
 {
-    Riscv::popSppSpie();
-    running->body();
+/*    Riscv::popSppSpie();
+    running->body(running->arguments);
     running->setFinished(true);
-    TCB::yield();
+    TCB::yield();*/
+    Riscv::popSppSpie();
+    if(running->body!= nullptr && running->arguments != nullptr){
+        running->body(running->arguments);
+    }
+    if(running->body!= nullptr && running->arguments == nullptr){
+        running->body(nullptr);
+    }
+/*    if(running->myThr!= nullptr) {
+        running->myThr->run();*/
+    //}
+    thread_exit();
 }
 //
 //  private constructor
 //
-TCB::TCB(Body body, uint64 timeSlice) :
+TCB::TCB(Body body, uint64 timeSlice, void* args) :
         body(body),
         stack(body != nullptr ? new uint64[STACK_SIZE] : nullptr),
         context({
@@ -50,9 +62,19 @@ TCB::TCB(Body body, uint64 timeSlice) :
                         stack != nullptr ? (uint64)(&stack[STACK_SIZE]) : 0
                 }),
         timeSlice(timeSlice),
-        finished(false)
+        finished(false),
+        arguments(args)
 {
     if (body != nullptr) {
         Scheduler::put(this);
     }
+}
+//
+//  thread exit
+//
+void TCB::threadExit()
+{
+    running->setFinished(true);
+    timeSliceCounter = 0;
+    thread_dispatch();
 }

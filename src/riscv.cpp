@@ -1,8 +1,8 @@
 #include "../h/riscv.hpp"
 
 #include "../lib/console.h"
-#include "../h/print.hpp"
-
+#include "../test/printing.hpp"
+#include "../h/tcb.hpp"
 #include "../h/MemoryAllocator.hpp"
 
 void Riscv::popSppSpie()
@@ -72,10 +72,28 @@ void Riscv::handleSupervisorTrap()
             __asm__ volatile("mv %0, a1" : "=r" (argumentPutc));
             __putc(argumentPutc);
         }
+        else if(sysCallRegisterCode == SysCallRegistersID::_THREAD_DISPATCH)
+        {
+            TCB::dispatch();
+        }
+        else if(sysCallRegisterCode == SysCallRegistersID::_THREAD_CREATE)
+        {
+            TCB** handle;
+            TCB::Body function;
+            void* args;
+            __asm__ volatile ("ld %[handle], 11 * 8(s0)": [handle] "=r"(handle));
+            __asm__ volatile ("ld %[func], 12 * 8(s0)": [func] "=r"(function));
+            __asm__ volatile ("ld %[arg], 13 * 8(s0)": [arg] "=r"(args));
+
+            *handle = TCB::createThread(function, args);
+        }
+        else if(sysCallRegisterCode == SysCallRegistersID::_THREAD_EXIT)
+        {
+            TCB::threadExit();
+        }
 
         w_sstatus(sstatus);
         w_sepc(sepc);
-
     } else if (scause == SOFTWARE_INTERRUPT)
     {
         mc_sip(SIP_SSIP);

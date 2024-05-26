@@ -36,3 +36,32 @@ void putc(char c)
     __asm__ volatile("ecall");
 
 }
+
+void thread_dispatch ()
+{
+    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_THREAD_DISPATCH));
+    __asm__ volatile("ecall");
+}
+
+int thread_create(thread_t* handle, void(*start_routine)(void*), void* arg)
+{
+    __asm__ volatile("mv a3, a2");
+    __asm__ volatile("mv a2, a1");
+    __asm__ volatile("mv a1, a0");
+    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_THREAD_CREATE));
+
+    __asm__ volatile ("ecall");
+
+    int retVal;
+    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
+    return retVal;
+}
+
+int thread_exit ()
+{
+    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_THREAD_EXIT));
+    __asm__ volatile ("ecall");
+    int retVal;
+    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
+    return retVal;
+}

@@ -1,6 +1,5 @@
 #include "../h/syscall_c.hpp"
-#include "../h/print.hpp"
-#include "../h/riscv.hpp"
+#include "../test/printing.hpp"
 
 using size_t = decltype(sizeof(0));
 

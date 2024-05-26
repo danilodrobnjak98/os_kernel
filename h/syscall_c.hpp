@@ -10,7 +10,7 @@ int mem_free(void* ptr);
 // threads
 class TCB;
 typedef TCB* thread_t;
-int thread_create(thread_t* handle, void(*start_routine)(void*));
+int thread_create(thread_t* handle, void(*start_routine)(void*), void* arg);
 int thread_exit();
 void thread_dispatch();
 

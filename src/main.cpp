@@ -1,31 +1,23 @@
 #include "../h/MemoryAllocator.hpp"
 #include "../h/riscv.hpp"
 #include "../h/syscall_c.hpp"
-
-extern void test_memory_allocator_array();
-extern void test_memory_allocator_matrix();
-
-void test_mem_allocator()
-{
-    test_memory_allocator_matrix();
-    MemoryAllocator::printString("\n");
-    test_memory_allocator_array();
-
-}
+#include "../h/tcb.hpp"
+#include "../test/printing.hpp"
+#include "../test/userMain.hpp"
 
 int main()
 {
     MemoryAllocator::mem_init();
     Riscv::w_stvec((uint64) &Riscv::supervisorTrap);
+    //Maskiranje timeslicea
+    __asm__ volatile ("csrc sie, %[mask]" : : [mask] "r"(2));
+    Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
+    thread_t run;
+    thread_create(&run, nullptr, nullptr);
 
-   // test_mem_allocator();
-   while(true)
-   {
-       MemoryAllocator::printString("Unesite tekst string : ");
-       char c = getc();
-       MemoryAllocator::printString("\n");
-       if (c == 'q') break;
-   }
+    TCB::running = run;
+    userMain();
+    printString("Finished Danilo Drobnjak\n");
 
     return 0;
 }

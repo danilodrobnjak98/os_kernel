@@ -1,4 +1,4 @@
-#include "../../h/print.hpp"
+#include "../../test/printing.hpp"
 #include "../../lib/console.h"
 
 void test_memory_allocator_array()
@@ -35,7 +35,7 @@ void test_memory_allocator_matrix() {
         if(matrix[i] == nullptr)
         {
             printString("Matrix i = ");
-            printInteger(i);
+            printInt(i);
             printString(" nullptr\n");
             return;
         }

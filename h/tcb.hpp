@@ -11,14 +11,15 @@ public:
     // friends and consts
     friend class Riscv;
 
-    using Body = void (*)();
-    //using Body = void (*)(void *);
+    //using Body = void (*)();
+    using Body = void (*)(void *);
 
-    static uint64 constexpr STACK_SIZE = 1024;
+    static uint64 constexpr STACK_SIZE = DEFAULT_STACK_SIZE;
     static uint64 constexpr TIME_SLICE = DEFAULT_TIME_SLICE;
 
     // creation and destruction
-    static TCB *createThread(Body body);
+    static TCB *createThread(Body body, void* args);
+    static void threadExit();
     ~TCB() { delete[] stack; }
 
     // getters and setters
@@ -33,7 +34,7 @@ public:
     // static attribute running thread
     static TCB *running;
 private:
-    TCB(Body body, uint64 timeSlice);
+    TCB(Body body, uint64 timeSlice, void* args);
 
     struct Context
     {
@@ -46,6 +47,7 @@ private:
     Context context;
     uint64 timeSlice;
     bool finished;
+    void* arguments;
     static uint64 timeSliceCounter;
 
     static void threadWrapper();
