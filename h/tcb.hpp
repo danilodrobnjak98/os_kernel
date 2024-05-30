@@ -10,8 +10,8 @@ class TCB
 public:
     // friends and consts
     friend class Riscv;
+    friend class Thread;
 
-    //using Body = void (*)();
     using Body = void (*)(void *);
 
     static uint64 constexpr STACK_SIZE = DEFAULT_STACK_SIZE;
@@ -20,13 +20,15 @@ public:
     // creation and destruction
     static TCB *createThread(Body body, void* args);
     static void threadExit();
-    ~TCB() { delete[] stack; }
+    static void ThreadClassWrapper(void* argument);
+
+    ~TCB();
 
     // getters and setters
-    bool isFinished() const { return finished; }
-    void setFinished(bool value) { finished = value; }
-    uint64 getTimeSlice() const { return timeSlice; }
-    void setTimeSlice(uint64 ts) { timeSlice = ts; }
+    bool isFinished() const;
+    void setFinished(bool value);
+    uint64 getTimeSlice() const;
+    void setTimeSlice(uint64 ts);
 
     // yield
     static void yield();
@@ -34,6 +36,7 @@ public:
     // static attribute running thread
     static TCB *running;
 private:
+    TCB();
     TCB(Body body, uint64 timeSlice, void* args);
 
     struct Context

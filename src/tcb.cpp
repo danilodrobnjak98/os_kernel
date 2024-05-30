@@ -1,6 +1,7 @@
 #include "../h/tcb.hpp"
 #include "../h/riscv.hpp"
 #include "../h/syscall_c.hpp"
+#include "../h/syscall_cpp.hpp"
 
 TCB *TCB::running = nullptr;
 uint64 TCB::timeSliceCounter = 0;
@@ -31,25 +32,22 @@ void TCB::dispatch()
     TCB::contextSwitch(&old->context, &running->context);
 }
 //
+// wrapper for CPP api
+//
+void TCB::ThreadClassWrapper(void* argument)
+{
+    Thread* thr = (Thread*) argument;
+    thr->run();
+}
+//
 // thread wrapper method
 //
 void TCB::threadWrapper()
 {
-/*    Riscv::popSppSpie();
+    Riscv::popSppSpie();
     running->body(running->arguments);
     running->setFinished(true);
-    TCB::yield();*/
-    Riscv::popSppSpie();
-    if(running->body!= nullptr && running->arguments != nullptr){
-        running->body(running->arguments);
-    }
-    if(running->body!= nullptr && running->arguments == nullptr){
-        running->body(nullptr);
-    }
-/*    if(running->myThr!= nullptr) {
-        running->myThr->run();*/
-    //}
-    thread_exit();
+    thread_dispatch();
 }
 //
 //  private constructor
@@ -70,6 +68,16 @@ TCB::TCB(Body body, uint64 timeSlice, void* args) :
     }
 }
 //
+// default constructor
+//
+TCB::TCB()
+:
+stack(nullptr),
+finished(false)
+{
+
+}
+//
 //  thread exit
 //
 void TCB::threadExit()
@@ -77,4 +85,35 @@ void TCB::threadExit()
     running->setFinished(true);
     timeSliceCounter = 0;
     thread_dispatch();
+}
+//
+// TCB destructor
+//
+TCB::~TCB()
+{
+    if (stack)
+        delete[] stack;
+}
+//
+// getters and setters
+//
+bool TCB::isFinished() const
+{
+    return finished;
+}
+
+void TCB::setFinished(bool value)
+{
+    finished = value;
+
+}
+
+uint64 TCB::getTimeSlice() const
+{
+    return timeSlice;
+}
+
+void TCB::setTimeSlice(uint64 ts)
+{
+    timeSlice = ts;
 }

@@ -9,7 +9,6 @@ int main()
 {
     MemoryAllocator::mem_init();
     Riscv::w_stvec((uint64) &Riscv::supervisorTrap);
-    //Maskiranje timeslicea
     __asm__ volatile ("csrc sie, %[mask]" : : [mask] "r"(2));
     Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
     thread_t run;
@@ -17,7 +16,10 @@ int main()
 
     TCB::running = run;
     userMain();
+
     printString("Finished Danilo Drobnjak\n");
+    Riscv::mc_sstatus(Riscv::SSTATUS_SIE);
+    delete TCB::running;
 
     return 0;
 }
