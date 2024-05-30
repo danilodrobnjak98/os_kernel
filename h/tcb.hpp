@@ -29,6 +29,12 @@ public:
     void setFinished(bool value);
     uint64 getTimeSlice() const;
     void setTimeSlice(uint64 ts);
+    void setBody(Body b);
+    Body getBody() const;
+    void setArg(void* arg);
+    void* getArg() const;
+
+    int getThrID() const;
 
     // yield
     static void yield();
@@ -52,6 +58,8 @@ private:
     bool finished;
     void* arguments;
     static uint64 timeSliceCounter;
+    int threadID;
+    static int posThrID;
 
     static void threadWrapper();
     static void contextSwitch(Context *oldContext, Context *runningContext);

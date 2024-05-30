@@ -5,7 +5,7 @@
 #include "../test/printing.hpp"
 #include "../test/userMain.hpp"
 
-int main()
+void initMain()
 {
     MemoryAllocator::mem_init();
     Riscv::w_stvec((uint64) &Riscv::supervisorTrap);
@@ -15,11 +15,19 @@ int main()
     thread_create(&run, nullptr, nullptr);
 
     TCB::running = run;
-    userMain();
+}
 
+void unitMain()
+{
     printString("Finished Danilo Drobnjak\n");
     Riscv::mc_sstatus(Riscv::SSTATUS_SIE);
     delete TCB::running;
+}
 
+int main()
+{
+    initMain();
+    userMain();
+    unitMain();
     return 0;
 }

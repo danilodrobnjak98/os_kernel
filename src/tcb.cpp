@@ -5,7 +5,7 @@
 
 TCB *TCB::running = nullptr;
 uint64 TCB::timeSliceCounter = 0;
-
+int TCB::posThrID = 0;
 //
 // Only way off thread creation, constructor is private
 //
@@ -36,8 +36,8 @@ void TCB::dispatch()
 //
 void TCB::ThreadClassWrapper(void* argument)
 {
-    Thread* thr = (Thread*) argument;
-    thr->run();
+    Thread* thread = static_cast<Thread*>(argument);
+    thread->run();
 }
 //
 // thread wrapper method
@@ -61,7 +61,8 @@ TCB::TCB(Body body, uint64 timeSlice, void* args) :
                 }),
         timeSlice(timeSlice),
         finished(false),
-        arguments(args)
+        arguments(args),
+        threadID(++posThrID)
 {
     if (body != nullptr) {
         Scheduler::put(this);
@@ -116,4 +117,28 @@ uint64 TCB::getTimeSlice() const
 void TCB::setTimeSlice(uint64 ts)
 {
     timeSlice = ts;
+}
+
+void TCB::setBody(Body b)
+{
+    body = b;
+}
+
+TCB::Body TCB::getBody() const
+{
+    return body;
+}
+void TCB::setArg(void* arg)
+{
+    arguments = arg;
+}
+
+void* TCB::getArg() const
+{
+    return arguments;
+}
+
+int TCB::getThrID() const
+{
+    return threadID;
 }

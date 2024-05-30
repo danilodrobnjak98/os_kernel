@@ -11,50 +11,56 @@ void Console::putc(char c)
     ::putc(c);
 }
 
-
-Thread::Thread()
+void Thread::initialize()
 {
     myHandle = new TCB();
-    myHandle->body = nullptr;
-    myHandle->arguments = nullptr;
+    myHandle->body = thrBody;
+    myHandle->arguments = argument;
+}
+
+void Thread::unitialize()
+{
+    if(myHandle->isFinished())
+        delete myHandle;
+}
+
+Thread::Thread()
+    :
+    thrBody(nullptr),
+    argument(nullptr)
+{
+    initialize();
 }
 
 Thread::Thread(void (*body)(void *), void *arg)
+    :
+    thrBody(body),
+    argument(arg)
 {
-    myHandle = new TCB();
-    myHandle->body = body;
-    myHandle->arguments = arg;
+    initialize();
 }
 
 Thread::~Thread() noexcept
 {
-    TCB* handle = this->myHandle;
-    if(handle)
-    {
-        if (handle->isFinished())
-        {
-            delete handle;
-        }
-    }
+    unitialize();
 }
 
 int Thread::start()
 {
-   // if (myHandle->started) { return -1; }
-    TCB::Body body = myHandle->body;
-    void *arg = myHandle->arguments;
-    delete myHandle;
-    if (body == nullptr)
+    if (myHandle->body)
     {
-        return thread_create(&myHandle, TCB::ThreadClassWrapper, this);
+        return thread_create(&myHandle, myHandle->body, myHandle->arguments);
     }
-    else
-    {
-        return thread_create(&myHandle, body, arg);
-    }
+    // body == nullptr ----> call run method
+    return thread_create(&myHandle, TCB::ThreadClassWrapper, this);
 }
 
 void Thread::dispatch()
 {
     thread_dispatch();
+}
+
+int Thread::GetThreadID() const
+{
+    return myHandle->getThrID();
 }
