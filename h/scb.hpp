@@ -5,6 +5,26 @@
 #include "tcb.hpp"
 #include "syscall_c.hpp"
 
+enum SEM_STATE
+{
+    SEM_STATE_OPEN = 0,
+    SEM_STATE_CLOSED = 1
+};
+
+class BlockedThreads
+{
+public:
+    void BLOCK();
+    void UNBLOCK();
+    void DELETE_ALL_THREADS();
+    int GET_SIZE();
+private:
+    void push(TCB* tcb);
+    TCB* pop();
+    List<TCB> blockedThreads;
+    int cnt;
+};
+
 class SCB
 {
 public:
@@ -15,13 +35,15 @@ public:
     int wait();
     int tryWait();
     int close();
-
-    void releaseAllThreads();
+    int signal_all();
 
 private:
+    int GetSemValue() const;
+    bool CheckIsSemOpen() const;
+
     int semValue;
-    bool open;
-    List<TCB> threads;
+    SEM_STATE state;
+    BlockedThreads blockedThreads;
 };
 
 #endif // _SCB_HPP_

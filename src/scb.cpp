@@ -1,65 +1,110 @@
 #include "../h/scb.hpp"
 
-SCB::SCB(sem_t* sem, uint val)
+void BlockedThreads::BLOCK()
 {
-    semValue = val;
-    *sem = this;
-    open = true;
+    TCB::running->setFinished(true);
+    push(TCB::running);
+    thread_dispatch();
 }
 
-void SCB::releaseAllThreads()
+int BlockedThreads::GET_SIZE()
 {
-    TCB* thr = threads.removeFirst();
+    return cnt;
+}
+
+void BlockedThreads::UNBLOCK()
+{
+    TCB *t = pop();
+    if(t != nullptr)
+    {
+        t->setFinished(false);
+        Scheduler::put(t);
+    }
+}
+
+void BlockedThreads::DELETE_ALL_THREADS()
+{
+    TCB* thr = pop();
     while(thr!= nullptr)
     {
         thr->setFinished(false);
         Scheduler::put(thr);
-        thr = threads.removeFirst();
+        thr = pop();
     }
+}
+
+void BlockedThreads::push(TCB* tcb)
+{
+    blockedThreads.addLast(tcb);
+    cnt++;
+}
+
+TCB* BlockedThreads::pop()
+{
+    cnt--;
+    return blockedThreads.removeFirst();
+}
+
+int SCB::GetSemValue() const
+{
+    return semValue;
+}
+
+bool SCB::CheckIsSemOpen() const
+{
+    return state == SEM_STATE_OPEN;
+}
+
+SCB::SCB(sem_t* sem, uint val)
+    :
+    semValue(val),
+    state(SEM_STATE::SEM_STATE_OPEN)
+{
+    *sem = this;
 }
 
 int SCB::signal()
 {
-    if(!open) return -1;
-    ++semValue;
-    if(semValue<=0) {
-        TCB *t = threads.removeFirst();
-        if(t != nullptr) {
-            t->setFinished(false);
-            Scheduler::put(t);
-        }
+    if(!CheckIsSemOpen()) return -1;
+    semValue += 1;
+    if(GetSemValue()<=0)
+    {
+        blockedThreads.UNBLOCK();
     }
     return 0;
 }
 
 int SCB::wait()
 {
-    if(!open) return -1;
-    --semValue;
-    if (semValue<0) {
-        TCB::running->setFinished(true);
-        threads.addLast(TCB::running);
-        thread_dispatch();
+    if(!CheckIsSemOpen()) return -1;
+    semValue -= 1;
+    if (GetSemValue()<0)
+    {
+        blockedThreads.BLOCK();
     }
     return 0;
 }
 
 int SCB::tryWait()
 {
-    if(!open) return -1;
-    --semValue;
-    if(semValue < 0)
-    {
-        return 0;
-    }
-    else
-        return 1;
+    if(!CheckIsSemOpen()) return -1;
+    semValue -= 1;
+    return GetSemValue() < 0 ? 0 : 1;
 }
 
 int SCB::close()
 {
-    open = false;
     semValue = 0;
-    releaseAllThreads();
-    return semValue;
+    state = SEM_STATE::SEM_STATE_CLOSED;
+    blockedThreads.DELETE_ALL_THREADS();
+    return GetSemValue();
+}
+
+int SCB::signal_all()
+{
+    if(!CheckIsSemOpen()) return -1;
+    while(blockedThreads.GET_SIZE() > 0)
+    {
+        signal();
+    }
 }
