@@ -3,15 +3,21 @@
 
 #include "list.hpp"
 #include "tcb.hpp"
+#include "syscall_c.hpp"
 
 class SCB
 {
+public:
+    SCB(sem_t* handle, uint val);
     ~SCB(){ close(); }
+
     int signal();
     int wait();
+    int tryWait();
     int close();
 
-    SCB(int initValue);
+    void releaseAllThreads();
+
 private:
     int semValue;
     bool open;

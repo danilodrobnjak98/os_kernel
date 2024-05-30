@@ -2,7 +2,7 @@
 
 #define LEVEL_1_IMPLEMENTED 0
 #define LEVEL_2_IMPLEMENTED 1
-#define LEVEL_3_IMPLEMENTED 0
+#define LEVEL_3_IMPLEMENTED 1
 #define LEVEL_4_IMPLEMENTED 0
 
 #if LEVEL_2_IMPLEMENTED == 1
@@ -18,7 +18,7 @@
 // TEST 3 (zadatak 3., kompletan C API sa semaforima, sinhrona promena konteksta)
 #include "../test/ConsumerProducer_C_API_test.hpp"
 // TEST 4 (zadatak 3., kompletan CPP API sa semaforima, sinhrona promena konteksta)
-#include "../test/ConsumerProducer_CPP_Sync_API_test.hpp"
+//#include "../test/ConsumerProducer_CPP_Sync_API_test.hpp"
 #endif
 
 #if LEVEL_4_IMPLEMENTED == 1
@@ -77,7 +77,7 @@ void userMain() {
             break;
         case 4:
 #if LEVEL_3_IMPLEMENTED == 1
-            producerConsumer_CPP_Sync_API();
+            //producerConsumer_CPP_Sync_API();
             printString("TEST 4 (zadatak 3., kompletan CPP API sa semaforima, sinhrona promena konteksta)\n");
 #endif
             break;

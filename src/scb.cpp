@@ -1,62 +1,65 @@
 #include "../h/scb.hpp"
-#include "../h/syscall_c.hpp"
 
-SCB::SCB(int initValue)
-    :
-    semValue(initValue),
-    open(true)
+SCB::SCB(sem_t* sem, uint val)
 {
+    semValue = val;
+    *sem = this;
+    open = true;
+}
 
+void SCB::releaseAllThreads()
+{
+    TCB* thr = threads.removeFirst();
+    while(thr!= nullptr)
+    {
+        thr->setFinished(false);
+        Scheduler::put(thr);
+        thr = threads.removeFirst();
+    }
 }
 
 int SCB::signal()
 {
-    if(!open)
-    {
-        // vec smo ga ugasili
-        return -1;
-    }
-
-    semValue += 1;
-
-    if(semValue > 0)
-        return 0;
-
-    TCB* t = threads.peekFirst();
-    if(t != nullptr)
-    {
-        t->setFinished(true);
-        // presipamo iz reda blokiranih u scheduler
-        threads.removeFirst();
-        Scheduler::put(t);
+    if(!open) return -1;
+    ++semValue;
+    if(semValue<=0) {
+        TCB *t = threads.removeFirst();
+        if(t != nullptr) {
+            t->setFinished(false);
+            Scheduler::put(t);
+        }
     }
     return 0;
 }
 
 int SCB::wait()
 {
-    if(!open)
-    {
-        // neko nam je zatvorio semafor
-        return -1;
+    if(!open) return -1;
+    --semValue;
+    if (semValue<0) {
+        TCB::running->setFinished(true);
+        threads.addLast(TCB::running);
+        thread_dispatch();
     }
+    return 0;
+}
 
-    semValue -= 1;
-
-    if(semValue >= 0)
+int SCB::tryWait()
+{
+    if(!open) return -1;
+    --semValue;
+    if(semValue < 0)
     {
         return 0;
     }
-    TCB::running->setFinished(true);
-    threads.addLast(TCB::running);
-    thread_dispatch();
-    return 0;
+    else
+        return 1;
 }
 
 int SCB::close()
 {
     open = false;
     semValue = 0;
+    releaseAllThreads();
     return semValue;
-    // mozes da izbacis iz thread liste i ubacis u sch ako treba
 }

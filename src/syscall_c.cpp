@@ -65,3 +65,64 @@ int thread_exit ()
     __asm__ volatile ("mv %0, a0" : "=r"(retVal));
     return retVal;
 }
+
+int sem_open(sem_t* handle, unsigned init)
+{
+    __asm__ volatile("mv a2, %0" : : "r" (init));
+    __asm__ volatile("mv a1, %0" : : "r" (handle));
+    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_SEM_OPEN));
+
+    __asm__ volatile ("ecall");
+
+    int retVal;
+    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
+    return retVal;
+}
+
+int sem_close(sem_t handle)
+{
+    __asm__ volatile("mv a1, %0" : : "r" (handle));
+    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_SEM_CLOSE));
+
+    __asm__ volatile ("ecall");
+
+    int retVal;
+    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
+    return retVal;
+}
+
+int sem_wait(sem_t id)
+{
+    __asm__ volatile("mv a1, %0" : : "r" (id));
+    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_SEM_WAIT));
+
+    __asm__ volatile ("ecall");
+
+    int retVal;
+    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
+    return retVal;
+}
+
+int sem_signal(sem_t id)
+{
+    __asm__ volatile("mv a1, %0" : : "r" (id));
+    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_SEM_SIGNAL));
+
+    __asm__ volatile ("ecall");
+
+    int retVal;
+    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
+    return retVal;
+}
+
+int sem_trywait(sem_t id)
+{
+    __asm__ volatile("mv a1, %0" : : "r" (id));
+    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_SEM_TRYWAIT));
+
+    __asm__ volatile ("ecall");
+
+    int retVal;
+    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
+    return retVal;
+}

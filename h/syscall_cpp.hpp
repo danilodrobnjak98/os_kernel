@@ -32,4 +32,9 @@ public:
     static char getc();
     static void putc(char c);
 };
+
+class Semaphore
+{
+
+};
 #endif //_SYSCALL_CPP_HPP_

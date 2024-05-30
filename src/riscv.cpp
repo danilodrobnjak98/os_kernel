@@ -3,6 +3,7 @@
 #include "../lib/console.h"
 #include "../test/printing.hpp"
 #include "../h/tcb.hpp"
+#include "../h/scb.hpp"
 #include "../h/MemoryAllocator.hpp"
 
 void Riscv::popSppSpie()
@@ -86,10 +87,50 @@ void Riscv::handleSupervisorTrap()
             __asm__ volatile ("ld %[arg], 13 * 8(s0)": [arg] "=r"(args));
 
             *handle = TCB::createThread(function, args);
+            putReturnValue(0, nullptr);
         }
         else if(sysCallRegisterCode == SysCallRegistersID::_THREAD_EXIT)
         {
             TCB::threadExit();
+        }
+        else if(sysCallRegisterCode == SysCallRegistersID::_SEM_OPEN)
+        {
+            sem_t *handle;
+            uint val;
+            __asm__ volatile("mv %0, a1" : "=r" (handle));
+            __asm__ volatile("mv %0, a2" : "=r" (val));
+            *handle = new SCB(handle, val);
+            int ret = 0;
+            putReturnValue(ret, nullptr);
+        }
+        else if(sysCallRegisterCode == SysCallRegistersID::_SEM_CLOSE)
+        {
+            sem_t handle;
+            __asm__ volatile("mv %0, a1" : "=r" (handle));
+            delete handle;
+            int ret = 0;
+            putReturnValue(ret, nullptr);
+        }
+        else if(sysCallRegisterCode == SysCallRegistersID::_SEM_SIGNAL)
+        {
+            sem_t handle;
+            __asm__ volatile("mv %0, a1" : "=r" (handle));
+            int ret = handle->signal();
+            putReturnValue(ret, nullptr);
+        }
+        else if(sysCallRegisterCode == SysCallRegistersID::_SEM_WAIT)
+        {
+            sem_t handle;
+            __asm__ volatile("mv %0, a1" : "=r" (handle));
+            int ret = handle->wait();
+            putReturnValue(ret, nullptr);
+        }
+        else if(sysCallRegisterCode == SysCallRegistersID::_SEM_TRYWAIT)
+        {
+            sem_t handle;
+            __asm__ volatile("mv %0, a1" : "=r" (handle));
+            int ret = handle->tryWait();
+            putReturnValue(ret, nullptr);
         }
 
         w_sstatus(sstatus);
