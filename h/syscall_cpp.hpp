@@ -35,6 +35,15 @@ public:
 
 class Semaphore
 {
+public:
+    Semaphore(uint  init = 1);
+    virtual ~Semaphore();
 
+    int wait();
+    int signal();
+    int timedWait(time_t time);
+    int tryWait();
+private:
+    sem_t myHandle;
 };
 #endif //_SYSCALL_CPP_HPP_

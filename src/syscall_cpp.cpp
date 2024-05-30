@@ -64,3 +64,33 @@ int Thread::GetThreadID() const
 {
     return myHandle->getThrID();
 }
+
+Semaphore::Semaphore(uint init )
+{
+    sem_open(&myHandle, init);
+}
+
+Semaphore::~Semaphore()
+{
+    sem_close(myHandle);
+}
+
+int Semaphore::wait()
+{
+    return sem_wait(myHandle);
+}
+
+int Semaphore::signal()
+{
+    return sem_signal(myHandle);
+}
+
+int Semaphore::timedWait(time_t time)
+{
+    return 0;
+}
+
+int Semaphore::tryWait()
+{
+    return  sem_trywait(myHandle);
+}
