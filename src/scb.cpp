@@ -107,4 +107,6 @@ int SCB::signal_all()
     {
         signal();
     }
+
+    return 0;
 }

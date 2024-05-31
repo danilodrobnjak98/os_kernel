@@ -1,128 +1,123 @@
 #include "../h/syscall_c.hpp"
 #include "../h/util.hpp"
 
+typedef uint64 uint64_t;
+
+#define SYSCALL_0(id) ({ \
+    uint64_t ret_value; \
+    __asm__ volatile( \
+        "mv a0, %1\n\t" \
+        "ecall\n\t" \
+        "mv %0, a0" \
+        : "=r" (ret_value) \
+        : "r" (id) \
+    ); \
+    ret_value; \
+})
+
+#define SYSCALL_1(id, arg1) ({ \
+    uint64_t ret_value; \
+    __asm__ volatile( \
+        "mv a1, %2\n\t" \
+        "mv a0, %1\n\t" \
+        "ecall\n\t" \
+        "mv %0, a0" \
+        : "=r" (ret_value) \
+        : "r" (id), "r" (arg1) \
+    ); \
+    ret_value; \
+})
+
+#define SYSCALL_2(id, arg1, arg2) ({ \
+    uint64_t ret_value; \
+    __asm__ volatile( \
+        "mv a2, %3\n\t" \
+        "mv a1, %2\n\t" \
+        "mv a0, %1\n\t" \
+        "ecall\n\t" \
+        "mv %0, a0" \
+        : "=r" (ret_value) \
+        : "r" (id), "r" (arg1), "r" (arg2) \
+    ); \
+    ret_value; \
+})
+
+#define SYSCALL_3(id, arg1, arg2, arg3) ({ \
+    uint64_t ret_value; \
+    __asm__ volatile( \
+        "mv a3, %4\n\t" \
+        "mv a2, %3\n\t" \
+        "mv a1, %2\n\t" \
+        "mv a0, %1\n\t" \
+        "ecall\n\t" \
+        "mv %0, a0" \
+        : "=r" (ret_value) \
+        : "r" (id), "r" (arg1), "r" (arg2), "r" (arg3) \
+    ); \
+    ret_value; \
+})
+
 void* mem_alloc(size_t size)
 {
-    __asm__ volatile ("mv a1, %[size]":: [size] "r"(size));
-    asm volatile("mv a0, %[id]" : :  [id]"r"(SysCallRegistersID::_MEM_ALLOC));
-    __asm__ volatile ("ecall");
-    uint64 ret_value;
-    __asm__ volatile ("mv %[ret_value], a0" : [ret_value] "=r"(ret_value));
-    return (void*)ret_value;
+    return (void*)SYSCALL_1(SysCallRegistersID::_MEM_ALLOC, size);
 }
 
-int mem_free(void *ptr) {
-    asm volatile("mv a1, a0");
-    asm volatile("mv a0, %0" : :  "r" (SysCallRegistersID::_MEM_FREE));
-    __asm__ volatile ("ecall");
-    int ret_value;
-    __asm__ volatile ("mv %[ret_value], a0" : [ret_value] "=r"(ret_value));
-    return ret_value;
+int mem_free(void *ptr)
+{
+    return (int)SYSCALL_1(SysCallRegistersID::_MEM_FREE, (uint64_t)ptr);
 }
 
 char getc()
 {
-    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_GETC));
-    __asm__ volatile("ecall");
-    char retVal;
-    __asm__ volatile("mv %0, a0" : "=r" (retVal));
-    return retVal;
+    return (char)SYSCALL_0(SysCallRegistersID::_GETC);
 }
 
 void putc(char c)
 {
-    __asm__ volatile("mv a1, a0");
-    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_PUTC));
-    __asm__ volatile("ecall");
-
+    SYSCALL_1(SysCallRegistersID::_PUTC, (uint64_t)c);
 }
 
-void thread_dispatch ()
+void thread_dispatch()
 {
-    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_THREAD_DISPATCH));
-    __asm__ volatile("ecall");
+    SYSCALL_0(SysCallRegistersID::_THREAD_DISPATCH);
 }
 
 int thread_create(thread_t* handle, void(*start_routine)(void*), void* arg)
 {
-    __asm__ volatile("mv a3, a2");
-    __asm__ volatile("mv a2, a1");
-    __asm__ volatile("mv a1, a0");
-    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_THREAD_CREATE));
-
-    __asm__ volatile ("ecall");
-
-    int retVal;
-    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
-    return retVal;
+    return (int)SYSCALL_3(SysCallRegistersID::_THREAD_CREATE, (uint64_t)handle, (uint64_t)start_routine, (uint64_t)arg);
 }
 
-int thread_exit ()
+int thread_exit()
 {
-    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_THREAD_EXIT));
-    __asm__ volatile ("ecall");
-    int retVal;
-    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
-    return retVal;
+    return (int)SYSCALL_0(SysCallRegistersID::_THREAD_EXIT);
 }
 
 int sem_open(sem_t* handle, unsigned init)
 {
-    __asm__ volatile("mv a2, %0" : : "r" (init));
-    __asm__ volatile("mv a1, %0" : : "r" (handle));
-    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_SEM_OPEN));
-
-    __asm__ volatile ("ecall");
-
-    int retVal;
-    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
-    return retVal;
+    return (int)SYSCALL_2(SysCallRegistersID::_SEM_OPEN, (uint64_t)handle, (uint64_t)init);
 }
 
 int sem_close(sem_t handle)
 {
-    __asm__ volatile("mv a1, %0" : : "r" (handle));
-    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_SEM_CLOSE));
-
-    __asm__ volatile ("ecall");
-
-    int retVal;
-    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
-    return retVal;
+    return (int)SYSCALL_1(SysCallRegistersID::_SEM_CLOSE, (uint64_t)handle);
 }
 
 int sem_wait(sem_t id)
 {
-    __asm__ volatile("mv a1, %0" : : "r" (id));
-    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_SEM_WAIT));
-
-    __asm__ volatile ("ecall");
-
-    int retVal;
-    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
-    return retVal;
+    return (int)SYSCALL_1(SysCallRegistersID::_SEM_WAIT, (uint64_t)id);
 }
 
 int sem_signal(sem_t id)
 {
-    __asm__ volatile("mv a1, %0" : : "r" (id));
-    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_SEM_SIGNAL));
-
-    __asm__ volatile ("ecall");
-
-    int retVal;
-    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
-    return retVal;
+    return (int)SYSCALL_1(SysCallRegistersID::_SEM_SIGNAL, (uint64_t)id);
 }
 
 int sem_trywait(sem_t id)
 {
-    __asm__ volatile("mv a1, %0" : : "r" (id));
-    __asm__ volatile("mv a0, %0" : : "r" (SysCallRegistersID::_SEM_TRYWAIT));
+    return (int)SYSCALL_1(SysCallRegistersID::_SEM_TRYWAIT, (uint64_t)id);
+}
 
-    __asm__ volatile ("ecall");
-
-    int retVal;
-    __asm__ volatile ("mv %0, a0" : "=r"(retVal));
-    return retVal;
+int sem_signalAll(sem_t id)
+{
+    return (int)SYSCALL_1(SysCallRegistersID::_SEM_SIGNAL_ALL, (uint64_t)id);
 }

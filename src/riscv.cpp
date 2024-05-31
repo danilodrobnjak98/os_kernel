@@ -92,6 +92,7 @@ void Riscv::handleSupervisorTrap()
         else if(sysCallRegisterCode == SysCallRegistersID::_THREAD_EXIT)
         {
             TCB::threadExit();
+            putReturnValue(0, nullptr);
         }
         else if(sysCallRegisterCode == SysCallRegistersID::_SEM_OPEN)
         {
@@ -130,6 +131,13 @@ void Riscv::handleSupervisorTrap()
             sem_t handle;
             __asm__ volatile("mv %0, a1" : "=r" (handle));
             int ret = handle->tryWait();
+            putReturnValue(ret, nullptr);
+        }
+        else if(sysCallRegisterCode == SysCallRegistersID::_SEM_SIGNAL_ALL)
+        {
+            sem_t handle;
+            __asm__ volatile("mv %0, a1" : "=r" (handle));
+            int ret = handle->signal_all();
             putReturnValue(ret, nullptr);
         }
 

@@ -21,6 +21,7 @@ namespace SysCallRegistersID
     const size_t _SEM_SIGNAL = 24;
     const size_t _SEM_TIMEDWAIT = 25;
     const size_t _SEM_TRYWAIT = 26;
+    const size_t _SEM_SIGNAL_ALL = 27;
 
     // sleep
     const size_t _TIMESLEEP = 31;
