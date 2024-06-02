@@ -99,45 +99,50 @@ void* MemoryAllocator::mem_alloc(size_t size)
 
     best_fit->size = best_fit->size - sz;
     MemBlock* newMemBlock = (MemBlock*)((char*)best_fit + best_fit->size);
-    newMemBlock->next = best_fit->next;
-    best_fit->next = newMemBlock;
-    newMemBlock->prev = best_fit;
+    bool used = true;
     newMemBlock->size = sz;
-    newMemBlock->isUsed = true;
+    newMemBlock->isUsed = used;
 
-    if(newMemBlock->next)
+    newMemBlock->next = best_fit->next;
+    newMemBlock->prev = best_fit;
+
+    best_fit->next = newMemBlock;
+
+    if (newMemBlock->next)
+    {
         newMemBlock->next->prev = newMemBlock;
+    }
 
     // adding in list of all used fragments
-     if(m_used == nullptr)
-     {
-         m_used = newMemBlock;
-         return (void*)((char*)newMemBlock + sizeof(MemBlock));
-     }
+    if(m_used == nullptr)
+    {
+        m_used = newMemBlock;
+        return (void*)((char*)newMemBlock + sizeof(MemBlock));
+    }
 
-     MemBlock* ptr = m_used;
-     if(newMemBlock <= m_used)
-     {
-         ptr->prev = newMemBlock;
-         newMemBlock->next = ptr;
-         m_used = newMemBlock;
-         return (void*)((char*)newMemBlock + sizeof(MemBlock));
-     }
+    MemBlock* ptr = m_used;
+    if(newMemBlock <= m_used)
+    {
+        ptr->prev = newMemBlock;
+        newMemBlock->next = ptr;
+        m_used = newMemBlock;
+        return (void*)((char*)newMemBlock + sizeof(MemBlock));
+    }
 
-     MemBlock* previous = nullptr, * current = ptr;
-     while(current<newMemBlock && current!= nullptr)
-     {
-         previous = current;
-         current = current->next;
-     }
-     if(current != nullptr)
-     {
-         previous->next = newMemBlock;
-         newMemBlock->next = current;
-         newMemBlock->prev = previous;
-         current->prev = newMemBlock;
-         return (void*)((char*)newMemBlock + sizeof(MemBlock));
-     }
+    MemBlock* previous = nullptr, * current = ptr;
+    while(current<newMemBlock && current!= nullptr)
+    {
+        previous = current;
+        current = current->next;
+    }
+    if(current != nullptr)
+    {
+        previous->next = newMemBlock;
+        newMemBlock->next = current;
+        newMemBlock->prev = previous;
+        current->prev = newMemBlock;
+        return (void*)((char*)newMemBlock + sizeof(MemBlock));
+    }
     previous->next = newMemBlock;
     newMemBlock->prev = previous;
     return (void*)((char*)newMemBlock + sizeof(MemBlock));
@@ -184,7 +189,6 @@ void MemoryAllocator::merge_blocks(MemBlock* cur)
 void MemoryAllocator::remove_block(MemBlock* current)
 {
     MemBlock* curr = m_used;
-    MemBlock* previous = nullptr;
 
     if (curr == current)
     {
@@ -195,19 +199,20 @@ void MemoryAllocator::remove_block(MemBlock* current)
         return;
     }
 
-    while (curr != nullptr && curr != current)
+    MemBlock* previous;
+    for(previous = nullptr; curr != nullptr && curr != current; previous = curr, curr = curr->next);
+
+    if (!curr)
     {
-        previous = curr;
-        curr = curr->next;
-    }
-
-    if (curr == nullptr)
         return;
-
-    previous->next = curr->next;
-    if (curr->next != nullptr)
-        curr->next->prev = previous;
-    curr = nullptr;
+    }
+    else
+    {
+        previous->next = curr->next;
+        if (curr->next != nullptr)
+            curr->next->prev = previous;
+        curr = nullptr;
+    }
 }
 
 
