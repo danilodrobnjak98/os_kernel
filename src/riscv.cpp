@@ -80,11 +80,11 @@ void Riscv::handleSupervisorTrap()
         else if(sysCallRegisterCode == SysCallRegistersID::_THREAD_CREATE)
         {
             TCB** handle;
-            TCB::Body function;
+            void (*function)(void *);
             void* args;
-            __asm__ volatile ("ld %[handle], 11 * 8(s0)": [handle] "=r"(handle));
-            __asm__ volatile ("ld %[func], 12 * 8(s0)": [func] "=r"(function));
-            __asm__ volatile ("ld %[arg], 13 * 8(s0)": [arg] "=r"(args));
+            __asm__ volatile("mv %0, a1" : "=r" (handle));
+            __asm__ volatile("mv %0, a2" : "=r" (function));
+            __asm__ volatile("mv %0, a3" : "=r" (args));
 
             *handle = TCB::createThread(function, args);
             putReturnValue(0, nullptr);
